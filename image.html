@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Sorpresas ✨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* --- VARIABLES DE COLOR AJUSTADAS PARA FONDO OSCURO --- */
+        :root {
+            --bg-color-dark: #050a18; /* Negro muy profundo con un toque azul */
+            --gradient-end: #101c40; /* Azul oscuro intenso */
+            --star-color: #ffffff;
+            --blue-glow-subtle: rgba(30, 80, 180, 0.4); /* Azul difuminado más sutil que la página final */
+            
+            --primary-pink: #ff478a; /* Rosa que resalta en el fondo oscuro */
+            --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            /* FIX 1: Permitir el scroll vertical. */
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            
+            /* GRADIENTE MÁS OSCURO */
+            background: linear-gradient(to bottom, var(--bg-color-dark), var(--gradient-end));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* FIX 3: Aumentar el padding inferior para que el botón fijo no tape la última fila */
+            padding: 2rem 0.5rem 80px 0.5rem; 
+            position: relative;
+            color: white; 
+        }
+        
+        /* Contenedor para las estrellas (fijo, solo de fondo) */
+        .stars-container {
+            position: fixed; /* Cambiado a fixed para que el fondo no se mueva con el scroll */
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 1; 
+        }
+
+        /* Estrellas (copiado de pagina_final.html) */
+        .star {
+            position: absolute;
+            background-color: var(--star-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+            box-shadow: 0 0 var(--glow-size) var(--blue-glow-subtle); 
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(0.7); }
+        }
+
+        /* Aseguramos que el contenido esté encima de las estrellas */
+        .header {
+            color: var(--primary-pink);
+            margin-bottom: 2rem;
+            text-shadow: 0 0 10px rgba(255, 71, 138, 0.5); /* Sombra para que el título resalte */
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            width: 100%;
+            padding: 1rem;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .gallery-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        .image-card {
+            background-color: rgba(255, 255, 255, 0.95); /* Tarjeta blanca casi opaca */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            will-change: transform;
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        
+        .image-card:active, .image-card.active {
+            box-shadow: 0 15px 40px rgba(255, 71, 138, 0.8);
+            transform: scale(1.05);
+        }
+
+        .image-wrapper {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .image-card.active .image-wrapper .surprise-img { opacity: 1; }
+        .image-card:not(.active) .image-wrapper .surprise-img { opacity: 0; }
+        .image-card.active .image-wrapper .initial-img { opacity: 0; }
+        
+        /* FIX 2: Botón Siguiente ahora es fijo en la parte inferior */
+        .next-btn {
+            position: fixed; /* Fijo para que no se mueva con el scroll y siempre esté disponible */
+            bottom: 20px; /* Separación desde la parte inferior */
+            left: 50%;
+            transform: translateX(-50%); /* Centrado horizontal */
+            
+            background-color: var(--primary-pink);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+        }
+        .next-btn:hover {
+            background-color: #ff85b3;
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 15px 35px rgba(255, 71, 138, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- CONTENEDOR DE ESTRELLAS -->
+    <div class="stars-container" id="starsContainer"></div>
+
+    <!-- Botón Siguiente Página -->
+    <button onclick="goToNextPage()" class="next-btn">
+        Página Final <i class="fas fa-arrow-right"></i>
+    </button>
+
+    <h1 class="header text-4xl md:text-5xl font-bold">Prueba suerte</h1>
+
+    <div class="gallery-grid" id="galleryGrid">
+        <!-- Las imágenes se cargarán aquí mediante JavaScript -->
+    </div>
+
+    <script>
+        // --- DATA DE IMÁGENES DE EJEMPLO (REEMPLAZA ESTO CON TUS URLS) ---
+        const IMAGE_PAIRS = [
+            { 
+                initial: 'https://www.dropbox.com/scl/fi/19k7ede7u2hgf112ryl7o/cat-sentado.jpg?rlkey=2x006l0b87co8fc0tmstvyor5&st=7jnvzcoz&dl=1', 
+                hover: 'https://www.dropbox.com/scl/fi/78hum2ucyqfu1b9dr0d9a/cat-asustado.jpg?rlkey=3pfl9ie7877qw09wdv3znggac&st=kljqt5yd&dl=1' 
+            },
+            { 
+                initial: 'https://www.dropbox.com/scl/fi/sgwxdi1o1wcv2tdyjaf1i/gato-sorbito.jpg?rlkey=jpfu3hlennul8x4y9xbs4jy4m&st=f0amhrhy&dl=1', 
+                hover: 'https://www.dropbox.com/scl/fi/cxlvwm8n0rl7nbms9jsr4/gato-inteligente.jpg?rlkey=oatcgfcz5yigf2240a2fi1llc&st=4oga7iy5&dl=1' 
+            },
+            { 
+                initial: 'https://www.dropbox.com/scl/fi/git9d2osj8ji8turdilo6/cat-acostado.jpg?rlkey=77b7pfimr9ls9xeczkngo76xk&st=kh9rxwjc&dl=1', 
+                hover: 'https://www.dropbox.com/scl/fi/pxangddv8hvidyyxk227l/shadow.jpg?rlkey=ciotqqyf5634qk2pwm0mnd1u2&st=3xrxkgcy&dl=1' 
+            },
+            { 
+                initial: 'https://www.dropbox.com/scl/fi/cq6oaezoid71fq3lfawsh/persona-con-ojitos.jpg?rlkey=r6h573b2f4c3ar7m9j8uw2qmg&st=36iulbtt&dl=1', 
+                hover: 'https://www.dropbox.com/scl/fi/0iou7jw0yi3hsky860o2f/persona-sonrojada.jpg?rlkey=26s161rf1gyn8npccd8lt96ng&st=qtdg5nvf&dl=1' 
+            },
+            { 
+                initial: 'https://www.dropbox.com/scl/fi/gwnei1wiacrdqkfl7v6gu/persona-esperando.jpg?rlkey=2gat272q2t8rt06xi3nlcc8zz&st=2ngbw9up&dl=1', 
+                hover: 'https://www.dropbox.com/scl/fi/i4yuyvpeaoxsut3mdksr6/persona-impaciente.jpg?rlkey=3krj2lq8xu9xp1dxkj9ygf3fo&st=zgzu5jr5&dl=1'             }
+            
+        ];
+        
+        const galleryGrid = document.getElementById('galleryGrid');
+        const starsContainer = document.getElementById('starsContainer');
+        const numStars = 100;
+
+        // --- FUNCIONES DE ESTRELLAS ---
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+
+            const size = Math.random() * 2.5 + 1; // Un poco más pequeñas
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+
+            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            star.style.setProperty('--glow-size', `${size * 2.5}px`); 
+
+            starsContainer.appendChild(star);
+        }
+
+        function initializeStars() {
+            for (let i = 0; i < numStars; i++) {
+                createStar();
+            }
+        }
+        
+        // --- FUNCIONES DE INTERACCIÓN DE GALERÍA ---
+        
+        function startPress(event) {
+            const card = event.currentTarget;
+            card.classList.add('active');
+            event.preventDefault();
+        }
+
+        function endPress(event) {
+            const card = event.currentTarget;
+            card.classList.remove('active');
+        }
+
+        function createCard(pair, index) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            card.id = `card-${index}`;
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'image-wrapper';
+            
+            const initialImg = document.createElement('img');
+            initialImg.className = 'initial-img';
+            initialImg.src = pair.initial;
+            initialImg.alt = `Imagen Inicial ${index + 1}`;
+            
+            const surpriseImg = document.createElement('img');
+            surpriseImg.className = 'surprise-img';
+            surpriseImg.src = pair.hover;
+            surpriseImg.alt = `Imagen Sorpresa ${index + 1}`;
+            
+            wrapper.appendChild(initialImg);
+            wrapper.appendChild(surpriseImg);
+            card.appendChild(wrapper);
+
+            card.addEventListener('touchstart', startPress, { passive: false });
+            card.addEventListener('touchend', endPress);
+            card.addEventListener('mousedown', startPress);
+            card.addEventListener('mouseup', endPress);
+            card.addEventListener('mouseleave', endPress);
+
+            return card;
+        }
+
+        // --- INICIALIZACIÓN ---
+        function initializeGallery() {
+            IMAGE_PAIRS.forEach((pair, index) => {
+                const card = createCard(pair, index);
+                galleryGrid.appendChild(card);
+            });
+            initializeStars(); // Inicializamos las estrellas con el resto de la galería
+        }
+
+        window.onload = initializeGallery;
+
+        function goToNextPage() {
+            alert("¡Vamos al Cielo Estrellado! 🌌");
+            window.location.href = 'lastpage.html';
+        }
+    </script>
+</body>
+</html>

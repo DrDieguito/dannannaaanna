@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un Video para Ti 💖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sour+Gummy:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color-dark: #050a18;
+            --gradient-end: #101c40;
+            --star-color: #ffffff;
+            --blue-glow: rgba(50, 100, 200, 0.6);
+            --heart: #ff2b4f;
+            --shadow: rgba(255, 43, 79, 0.6);
+        }
+
+        body {
+            font-family: 'Sour Gummy', sans-serif;
+            margin: 0;
+            overflow: hidden; 
+            background: linear-gradient(to bottom, var(--bg-color-dark), var(--gradient-end));
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative; 
+        }
+
+        /* --- ESTILOS DEL FONDO DE ESTRELLAS (IDÉNTICO A ANTES) --- */
+        .stars-container {
+            position: absolute; width: 100%; height: 100%;
+            top: 0; left: 0; overflow: hidden; z-index: 1;
+        }
+        .star {
+            position: absolute; background-color: var(--star-color);
+            border-radius: 50%; opacity: 0;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+            box-shadow: 0 0 var(--glow-size) var(--blue-glow);
+        }
+        @keyframes twinkle {
+            0% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0; transform: scale(0.7); }
+        }
+
+        /* --- CONTENIDO PRINCIPAL --- */
+        .main-content {
+            position: relative;
+            z-index: 10; 
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-title {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: 1.5rem;
+            color: #e0f2f7;
+            text-shadow: 0 0 15px #81d4fa, 0 0 30px #4fc3f7;
+            animation: fadeInScale 2s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* --- ESTILOS DEL CORAZÓN (COPIADOS DE INDEX.HTML) --- */
+        .heart-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem; /* Espacio antes del botón de volver */
+        }
+        .heart-btn { 
+            display: grid; place-items: center; 
+            width: clamp(280px, 40vmin, 520px); 
+            height: clamp(280px, 40vmin, 520px);
+            border: none; background: transparent; cursor: pointer; 
+            filter: drop-shadow(0 0 40px rgba(255, 43, 79, .55));
+            transition: transform .1s ease;
+            z-index: 2;
+        }
+        .heart-btn:active { transform: scale(.95); }
+        .heart { width: 85%; height: 85%; display: block; transform-origin: center center; }
+        .heart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+        .heart svg .core {
+            fill: var(--heart);
+            filter: drop-shadow(0 0 20px var(--shadow)) drop-shadow(0 0 40px rgba(255, 43, 79, .4));
+            animation: gentleBeat 2.5s ease-in-out infinite;
+            transform-origin: 50% 50%;
+        }
+        .heart svg .shine { fill: rgba(255,255,255,.35); mix-blend-mode: screen; }
+        @keyframes gentleBeat { 
+            0%, 100% { transform: scale(1); } 
+            50% { transform: scale(1.05); } 
+        }
+
+        /* --- ESTILOS DEL MODAL (POPUP) DEL VIDEO --- */
+        .video-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Fondo negro translúcido */
+            display: none; /* Oculto por defecto */
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .video-modal-content {
+            position: relative;
+            width: 90vw;
+            max-width: 800px;
+            background: #000;
+            border-radius: 10px;
+            box-shadow: 0 0 40px rgba(255, 43, 79, .5);
+        }
+        .video-modal-content video {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+        .close-btn {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 40px;
+            height: 40px;
+            background-color: var(--heart);
+            color: white;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 2px solid white;
+            z-index: 1010;
+        }
+
+        /* --- BOTÓN DE VOLVER AL INICIO --- */
+        .home-btn {
+            background-color: #2196f3; 
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(33, 150, 243, 0.4);
+        }
+        .home-btn:hover {
+            background-color: #1976d2;
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="stars-container" id="starsContainer"></div>
+
+    <div class="main-content">
+        <h1 class="page-title">Un último mensaje para usted</h1>
+
+        <!-- Corazón (Copiado de index.html) -->
+        <div class.heart-container">
+            <button class="heart-btn" id="finalHeartBtn">
+                <span class="heart">
+                    <svg viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="g" cx="50%" cy="40%" r="70%">
+                                <stop offset="0%" stop-color="#ff5f7a" />
+                                <stop offset="40%" stop-color="#ff2b4f" />
+                                <stop offset="100%" stop-color="#c91534" />
+                            </radialGradient>
+                        </defs>
+                        <path class="core" d="M100,162.2C17.7,99.5,6,77.5,6,52.3C6,27.1,27.1,6,52.3,6c15.4,0,30.8,7.7,40,20.6l7.7,9.6l7.7-9.6 c9.2-12.9,24.6-20.6,40-20.6c25.2,0,46.3,21.1,46.3,46.3c0,25.2-11.7,47.2-94,109.9L100,162.2L100,162.2z" fill="url(#g)"/>
+                        <path class="shine" d="M73 47c-12 0-23 6-29 16-2 3-1 7 2 9 3 2 7 1 9-2 4-7 12-11 20-11 4 0 7-3 7-7s-3-5-9-5Z"/>
+                    </svg>
+                </span>
+            </button>
+        </div>
+
+        <button onclick="goToHomePage()" class="home-btn">
+            Volver al Inicio <i class="fas fa-home"></i>
+        </button>
+    </div>
+
+    <!-- MODAL (POPUP) DEL VIDEO -->
+    <div class="video-modal" id="videoModal">
+        <div class="video-modal-content">
+            <span class="close-btn" id="closeModalBtn">&times;</span>
+            
+            <video id="finalVideo" controls preload="metadata">
+                <!-- 
+                    INSTRUCCIÓN IMPORTANTE:
+                    Pega aquí la URL directa de tu video (MP4, WEBM, etc.)
+                    
+                    Si usas Dropbox: Cambia el final del enlace por ?dl=1
+                    Si usas Google Drive: Usa el formato https://drive.google.com/uc?export=download&id=TU_ID_DE_ARCHIVO
+                -->
+                <source src="https://www.dropbox.com/scl/fi/2vy6nsfho4b6khb3of8a3/Animaci-n_Rom-ntica_Creativa.mp4?rlkey=auddd3j5yn6p1qnf7420dp1is&st=cml858l4&dl=1" type="video/mp4">
+                Tu navegador no soporta este video.
+            </video>
+        </div>
+    </div>
+
+    <script>
+        const starsContainer = document.getElementById('starsContainer');
+        const numStars = 100;
+
+        // --- FUNCIONES DE ESTRELLAS ---
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = `${Math.random() * 100}vw`;
+            star.style.top = `${Math.random() * 100}vh`;
+            const size = Math.random() * 3 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+            star.style.animationDelay = `${Math.random() * 2}s`;
+            star.style.setProperty('--glow-size', `${size * 2}px`);
+            starsContainer.appendChild(star);
+        }
+        for (let i = 0; i < numStars; i++) {
+            createStar();
+        }
+
+        // --- NAVEGACIÓN ---
+        function goToHomePage() {
+            alert("Volviendo al corazón... ❤️");
+            window.location.href = 'index.html'; 
+        }
+
+        // --- LÓGICA DEL MODAL DEL VIDEO ---
+        const finalHeartBtn = document.getElementById('finalHeartBtn');
+        const videoModal = document.getElementById('videoModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const finalVideo = document.getElementById('finalVideo');
+
+        // Abrir el modal
+        finalHeartBtn.addEventListener('click', () => {
+            // Primero, comprueba si se ha puesto una URL en el video
+            const videoSource = finalVideo.getElementsByTagName('source')[0].src;
+            if (!videoSource || videoSource === window.location.href) { // Si está vacío o apunta a la página actual
+                alert("¡Aún no has adjuntado el video! Edita el archivo pagina_final.html.");
+                return;
+            }
+            
+            videoModal.style.display = 'flex';
+            finalVideo.play();
+        });
+
+        // Cerrar el modal
+        closeModalBtn.addEventListener('click', () => {
+            videoModal.style.display = 'none';
+            finalVideo.pause();
+            finalVideo.currentTime = 0; // Reinicia el video
+        });
+
+        // Opcional: Cerrar si hace clic fuera del video
+        videoModal.addEventListener('click', (event) => {
+            // Cierra solo si se hace clic en el fondo (el modal) y no en el contenido (el video)
+            if (event.target === videoModal) {
+                videoModal.style.display = 'none';
+                finalVideo.pause();
+                finalVideo.currentTime = 0;
+            }
+        });
+    </script>
+</body>
+</html>
